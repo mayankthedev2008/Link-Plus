@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link Plus Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --c1: #6c47ff;   /* vivid violet */
+  --c2: #ff4f8b;   /* hot pink */
+  --c3: #00d4aa;   /* cyan-green */
+  --c4: #ff8c42;   /* warm orange */
+  --c5: #3b9eff;   /* electric blue */
+  --bg: #f0eef8;
+  --bg2: #ffffff;
+  --dark: #0d0b1a;
+  --dark2: #13112a;
+  --text: #0d0b1a;
+  --muted: #6b6880;
+  --white: #ffffff;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+/* ═══ CURSOR ═══ */
+.cursor { position: fixed; width: 12px; height: 12px; border-radius: 50%; background: var(--c1); pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.1s, background 0.3s; mix-blend-mode: multiply; }
+.cursor-trail { position: fixed; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--c2); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: left 0.15s ease, top 0.15s ease, width 0.3s, height 0.3s; }
+body:not(:hover) .cursor, body:not(:hover) .cursor-trail { opacity: 0; }
+
+/* ═══ NOISE ═══ */
+body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:9990; }
+
+/* ═══ NAV ═══ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 56px;
+  background: rgba(240,238,248,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(108,71,255,0.1);
+  transition: background 0.3s;
+}
+.nav-logo {
+  font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-links { display: flex; gap: 40px; list-style: none; }
+.nav-links a { font-size: 0.88rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: color 0.25s; }
+.nav-links a:hover { color: var(--c1); }
+.nav-btn {
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--white); background: linear-gradient(135deg, var(--c1), var(--c2));
+  padding: 11px 26px; border-radius: 100px; text-decoration: none;
+  box-shadow: 0 8px 24px rgba(108,71,255,0.35);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.nav-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(108,71,255,0.45); }
+
+/* ═══ HERO ═══ */
+.hero {
+  min-height: 100vh;
+  padding: 130px 56px 80px;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* Animated blobs */
+.blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.55;
+  animation: blobFloat 8s ease-in-out infinite;
+}
+.blob-1 { width: 600px; height: 600px; background: var(--c1); top: -150px; right: -100px; animation-delay: 0s; }
+.blob-2 { width: 400px; height: 400px; background: var(--c2); top: 50%; left: -100px; animation-delay: -3s; }
+.blob-3 { width: 350px; height: 350px; background: var(--c3); bottom: -80px; right: 25%; animation-delay: -5s; }
+.blob-4 { width: 250px; height: 250px; background: var(--c4); top: 30%; right: 40%; animation-delay: -2s; }
+
+@keyframes blobFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(30px,-20px) scale(1.05); }
+  66% { transform: translate(-20px,15px) scale(0.95); }
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.7); border: 1px solid rgba(108,71,255,0.2);
+  padding: 8px 18px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c1); margin-bottom: 32px;
+  animation: fadeSlideDown 0.8s ease 0.1s both;
+  backdrop-filter: blur(10px);
+}
+.hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c3); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+.hero-h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(3.2rem, 5.5vw, 5.5rem);
+  font-weight: 900; line-height: 1.02;
+  letter-spacing: -0.04em; color: var(--dark);
+  animation: fadeSlideDown 0.8s ease 0.25s both;
+}
+.hero-h1 .grad {
+  background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 50%, var(--c4) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  background-size: 200% 200%;
+  animation: gradShift 5s ease infinite;
+}
+@keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+.hero-sub {
+  font-size: 1.05rem; font-weight: 400; line-height: 1.75;
+  color: var(--muted); margin-top: 24px; max-width: 480px;
+  animation: fadeSlideDown 0.8s ease 0.4s both;
+}
+
+.hero-actions {
+  display: flex; gap: 18px; align-items: center;
+  margin-top: 44px;
+  animation: fadeSlideDown 0.8s ease 0.55s both;
+}
+.btn-main {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  padding: 16px 36px; border-radius: 100px; text-decoration: none;
+  box-shadow: 0 12px 30px rgba(108,71,255,0.4);
+  transition: transform 0.25s, box-shadow 0.25s;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-main:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(108,71,255,0.5); }
+.btn-main svg { transition: transform 0.25s; }
+.btn-main:hover svg { transform: translateX(4px); }
+.btn-out {
+  font-size: 0.88rem; font-weight: 600; color: var(--dark);
+  border: 1.5px solid rgba(13,11,26,0.2); padding: 15px 30px; border-radius: 100px;
+  text-decoration: none; transition: border-color 0.25s, color 0.25s;
+}
+.btn-out:hover { border-color: var(--c1); color: var(--c1); }
+
+/* Hero right — floating card stack */
+.hero-right { position: relative; height: 480px; animation: fadeIn 1s ease 0.6s both; }
+
+.float-card {
+  position: absolute; background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  padding: 28px; backdrop-filter: blur(20px);
+  animation: cardFloat linear infinite;
+}
+.fc-1 { width: 200px; top: 0; left: 20px; animation-duration: 6s; animation-delay: 0s; }
+.fc-2 { width: 220px; top: 80px; right: 0; animation-duration: 7s; animation-delay: -2s; }
+.fc-3 { width: 190px; bottom: 60px; left: 40px; animation-duration: 5.5s; animation-delay: -1s; }
+.fc-4 { width: 170px; bottom: 20px; right: 30px; animation-duration: 8s; animation-delay: -4s; }
+.fc-5 { width: 210px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-duration: 9s; animation-delay: -3s; }
+
+@keyframes cardFloat {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+.fc-5 { animation-name: cardFloat5; }
+@keyframes cardFloat5 {
+  0%,100% { transform: translate(-50%,-50%) translateY(0); }
+  50% { transform: translate(-50%,-50%) translateY(-10px); }
+}
+
+.fc-icon {
+  width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 14px;
+}
+.ic1 { background: linear-gradient(135deg,#e8e0ff,#d0c4ff); }
+.ic2 { background: linear-gradient(135deg,#ffe0ef,#ffcce0); }
+.ic3 { background: linear-gradient(135deg,#d0f5ed,#b8ede1); }
+.ic4 { background: linear-gradient(135deg,#ffebd6,#ffd9b8); }
+.ic5 { background: linear-gradient(135deg,#d6ecff,#b8dbff); }
+
+.fc-num {
+  font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+}
+.fc-label { font-size: 0.72rem; font-weight: 500; color: var(--muted); margin-top: 4px; }
+
+/* ═══ MARQUEE ═══ */
+.marquee-wrap {
+  padding: 20px 0; overflow: hidden;
+  background: linear-gradient(135deg, var(--c1), var(--c2), var(--c4));
+  position: relative;
+}
+.marquee-track { display: flex; gap: 0; animation: marquee 18s linear infinite; }
+.marquee-item {
+  font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.85);
+  padding: 0 48px; white-space: nowrap;
+  display: flex; align-items: center; gap: 48px;
+}
+.marquee-item::after { content:'✦'; font-size: 0.6rem; opacity: 0.7; }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ═══ STATS STRIP ═══ */
+.stats-strip {
+  background: var(--bg2); padding: 64px 56px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 2px; position: relative;
+}
+.stats-strip::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c4), var(--c5));
+}
+.stat-item {
+  padding: 40px 36px; text-align: center;
+  border-right: 1px solid rgba(0,0,0,0.06);
+  transition: background 0.3s;
+}
+.stat-item:last-child { border-right: none; }
+.stat-item:hover { background: rgba(108,71,255,0.03); }
+.stat-n {
+  font-size: 3.5rem; font-weight: 900; letter-spacing: -0.05em; line-height: 1;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-l { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 10px; }
+
+/* ═══ ABOUT ═══ */
+.about { padding: 120px 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; background: var(--bg); }
+.about-visual {
+  position: relative; border-radius: 32px; overflow: hidden;
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+  min-height: 500px; display: flex; align-items: center; justify-content: center;
+}
+.about-visual-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(108,71,255,0.5) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(255,79,139,0.4) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0,212,170,0.3) 0%, transparent 60%);
+}
+.about-shield-wrap { position: relative; z-index: 2; }
+.shield-svg { width: 180px; height: 220px; filter: drop-shadow(0 0 50px rgba(108,71,255,0.8)); animation: shieldPulse 3s ease-in-out infinite; }
+@keyframes shieldPulse { 0%,100%{filter:drop-shadow(0 0 50px rgba(108,71,255,0.8))} 50%{filter:drop-shadow(0 0 80px rgba(255,79,139,0.9))} }
+.about-badge-yr {
+  position: absolute; bottom: 32px; left: 32px;
+  font-size: 6rem; font-weight: 900; letter-spacing: -0.05em;
+  color: rgba(255,255,255,0.06); line-height: 1; pointer-events: none;
+}
+.about-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, rgba(108,71,255,0.12), rgba(255,79,139,0.12));
+  border: 1px solid rgba(108,71,255,0.25); border-radius: 100px;
+  padding: 8px 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c1); margin-bottom: 24px;
+}
+.about h2 {
+  font-size: clamp(2.2rem, 3.5vw, 3.5rem); font-weight: 900;
+  letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 28px;
+}
+.about h2 span { background: linear-gradient(135deg,var(--c1),var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.about p { font-size: 0.95rem; line-height: 1.85; color: var(--muted); margin-bottom: 20px; font-weight: 400; }
+.about-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px; }
+.chip {
+  padding: 8px 20px; border-radius: 100px;
+  font-size: 0.78rem; font-weight: 600;
+  border: 1.5px solid; transition: all 0.25s;
+}
+.chip-v { border-color: var(--c1); color: var(--c1); }
+.chip-v:hover { background: var(--c1); color: white; }
+.chip-p { border-color: var(--c2); color: var(--c2); }
+.chip-p:hover { background: var(--c2); color: white; }
+.chip-c { border-color: var(--c3); color: var(--c3); }
+.chip-c:hover { background: var(--c3); color: white; }
+.chip-o { border-color: var(--c4); color: var(--c4); }
+.chip-o:hover { background: var(--c4); color: white; }
+
+/* ═══ PRODUCTS ═══ */
+.products { padding: 120px 56px; background: var(--dark); position: relative; overflow: hidden; }
+.products-bg-blob {
+  position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15;
+}
+.pb1 { width: 500px; height: 500px; background: var(--c1); top: -100px; left: -100px; }
+.pb2 { width: 400px; height: 400px; background: var(--c2); bottom: -100px; right: -100px; }
+.pb3 { width: 300px; height: 300px; background: var(--c3); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+.products-header { text-align: center; margin-bottom: 70px; position: relative; z-index: 2; }
+.section-tag-dark {
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 16px;
+}
+.products-header h2 {
+  font-size: clamp(2.4rem, 4vw, 4rem); font-weight: 900;
+  letter-spacing: -0.04em; color: white; line-height: 1.05;
+}
+.products-header p { font-size: 0.95rem; color: rgba(255,255,255,0.45); margin-top: 16px; font-weight: 400; }
+
+.products-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  position: relative; z-index: 2;
+}
+.prod-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px; padding: 40px 36px;
+  position: relative; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, background 0.3s;
+  cursor: default;
+}
+.prod-card::before {
+  content:''; position:absolute; inset:0; border-radius:24px; opacity:0;
+  background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+  transition: opacity 0.35s;
+}
+.prod-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.15); }
+.prod-card:hover::before { opacity: 0.08; }
+
+.prod-icon-wrap {
+  width: 60px; height: 60px; border-radius: 18px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+  position: relative; z-index: 1;
+}
+.prod-num {
+  position: absolute; top: 28px; right: 32px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+  opacity: 0.3; color: white;
+}
+.prod-name {
+  font-size: 1.05rem; font-weight: 800; color: white; margin-bottom: 12px;
+  letter-spacing: -0.02em; line-height: 1.3; position: relative; z-index: 1;
+}
+.prod-desc {
+  font-size: 0.83rem; line-height: 1.75; color: rgba(255,255,255,0.45); position: relative; z-index: 1;
+}
+.prod-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.78rem; font-weight: 700; margin-top: 24px;
+  text-decoration: none; position: relative; z-index: 1;
+  transition: gap 0.25s;
+}
+.prod-link:hover { gap: 14px; }
+.prod-card:nth-child(1) { --grad-a:#6c47ff; --grad-b:#9b7aff; }
+.prod-card:nth-child(2) { --grad-a:#ff4f8b; --grad-b:#ff85aa; }
+.prod-card:nth-child(3) { --grad-a:#00d4aa; --grad-b:#00f0c0; }
+.prod-card:nth-child(4) { --grad-a:#ff8c42; --grad-b:#ffb47a; }
+.prod-card:nth-child(5) { --grad-a:#3b9eff; --grad-b:#70bfff; }
+.prod-card:nth-child(6) { --grad-a:#b447ff; --grad-b:#d47aff; }
+.prod-card:nth-child(1) .prod-link { color: #9b7aff; }
+.prod-card:nth-child(2) .prod-link { color: #ff85aa; }
+.prod-card:nth-child(3) .prod-link { color: #00d4aa; }
+.prod-card:nth-child(4) .prod-link { color: #ff8c42; }
+.prod-card:nth-child(5) .prod-link { color: #3b9eff; }
+.prod-card:nth-child(6) .prod-link { color: #d47aff; }
+.prod-card:nth-child(1) .prod-icon-wrap { background: rgba(108,71,255,0.2); }
+.prod-card:nth-child(2) .prod-icon-wrap { background: rgba(255,79,139,0.2); }
+.prod-card:nth-child(3) .prod-icon-wrap { background: rgba(0,212,170,0.2); }
+.prod-card:nth-child(4) .prod-icon-wrap { background: rgba(255,140,66,0.2); }
+.prod-card:nth-child(5) .prod-icon-wrap { background: rgba(59,158,255,0.2); }
+.prod-card:nth-child(6) .prod-icon-wrap { background: rgba(180,71,255,0.2); }
+
+/* ═══ WHY ═══ */
+.why { padding: 120px 56px; background: var(--bg2); }
+.why-header { text-align: center; margin-bottom: 70px; }
+.why-header h2 { font-size: clamp(2.4rem,4vw,4rem); font-weight:900; letter-spacing:-0.04em; }
+.why-header h2 span { background: linear-gradient(135deg,var(--c3),var(--c5)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.why-header p { color:var(--muted); margin-top:14px; font-size:0.95rem; }
+.why-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
+.why-card {
+  padding: 48px 44px; border-radius: 24px; position: relative; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.why-card:hover { transform: translateY(-6px); }
+.wc1 { background: linear-gradient(135deg, #f0ecff, #e4d9ff); border: 1px solid rgba(108,71,255,0.15); }
+.wc2 { background: linear-gradient(135deg, #fff0f5, #ffd9e8); border: 1px solid rgba(255,79,139,0.15); }
+.wc3 { background: linear-gradient(135deg, #eafaf7, #d0f5ec); border: 1px solid rgba(0,212,170,0.2); }
+.wc4 { background: linear-gradient(135deg, #fff5ee, #ffe8d4); border: 1px solid rgba(255,140,66,0.2); }
+.why-card-icon { font-size: 2.2rem; margin-bottom: 22px; display:block; }
+.why-card h3 { font-size: 1.2rem; font-weight: 800; letter-spacing:-0.02em; margin-bottom: 12px; }
+.why-card p { font-size: 0.85rem; line-height: 1.8; color: var(--muted); }
+.wc1 h3 { color: var(--c1); }
+.wc2 h3 { color: var(--c2); }
+.wc3 h3 { color: var(--c3); }
+.wc4 h3 { color: var(--c4); }
+
+/* ═══ TESTIMONIALS ═══ */
+.testi { padding: 120px 56px; background: var(--bg); overflow: hidden; }
+.testi-header { text-align:center; margin-bottom:70px; }
+.testi-header h2 { font-size:clamp(2.4rem,4vw,4rem); font-weight:900; letter-spacing:-0.04em; }
+.testi-header h2 span { background:linear-gradient(135deg,var(--c2),var(--c4)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.testi-track {
+  display: flex; gap: 24px;
+  animation: testiScroll 28s linear infinite;
+  width: max-content;
+}
+.testi-track:hover { animation-play-state: paused; }
+@keyframes testiScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.testi-card {
+  width: 360px; flex-shrink: 0;
+  background: white; border-radius: 24px; padding: 40px 36px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: transform 0.3s;
+}
+.testi-card:hover { transform: scale(1.02); }
+.testi-stars { display:flex; gap:4px; margin-bottom: 20px; }
+.tstar { font-size:1rem; }
+.t1 .tstar { color: var(--c1); }
+.t2 .tstar { color: var(--c2); }
+.t3 .tstar { color: var(--c3); }
+.t4 .tstar { color: var(--c4); }
+.t5 .tstar { color: var(--c5); }
+.t6 .tstar { color: var(--c1); }
+.testi-text { font-size: 0.95rem; line-height: 1.75; color: var(--text); font-weight:400; margin-bottom:28px; font-style:italic; }
+.testi-author { display:flex; align-items:center; gap:14px; }
+.testi-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; font-weight:700; color:white; flex-shrink:0;
+}
+.t1 .testi-avatar { background: linear-gradient(135deg,var(--c1),var(--c2)); }
+.t2 .testi-avatar { background: linear-gradient(135deg,var(--c2),var(--c4)); }
+.t3 .testi-avatar { background: linear-gradient(135deg,var(--c3),var(--c5)); }
+.t4 .testi-avatar { background: linear-gradient(135deg,var(--c4),var(--c2)); }
+.t5 .testi-avatar { background: linear-gradient(135deg,var(--c5),var(--c1)); }
+.t6 .testi-avatar { background: linear-gradient(135deg,var(--c1),var(--c3)); }
+.testi-name { font-size:0.88rem; font-weight:700; }
+.testi-loc { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+
+/* ═══ CTA ═══ */
+.cta-band {
+  margin: 0 56px 80px;
+  border-radius: 32px; overflow: hidden; position: relative;
+  background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 50%, var(--c4) 100%);
+  padding: 80px 80px;
+  display: flex; align-items: center; justify-content: space-between; gap: 60px;
+}
+.cta-band::before {
+  content:''; position:absolute; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.cta-blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:0.3; }
+.ctab1 { width:300px;height:300px; background:white; top:-100px; right:200px; }
+.ctab2 { width:200px;height:200px; background:#ffd; bottom:-80px; right:0; }
+.cta-left { position:relative; z-index:2; }
+.cta-left h2 { font-size:clamp(2rem,3vw,3rem); font-weight:900; letter-spacing:-0.03em; color:white; line-height:1.1; margin-bottom:16px; }
+.cta-left p { font-size:0.95rem; color:rgba(255,255,255,0.75); line-height:1.75; max-width:420px; }
+.cta-right-form {
+  background: white; border-radius: 24px; padding: 40px;
+  width: 400px; flex-shrink: 0; position: relative; z-index: 2;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+}
+.cta-right-form h3 { font-size:1.25rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:6px; }
+.cta-right-form p { font-size:0.8rem; color:var(--muted); margin-bottom:28px; }
+.field {
+  width:100%; background: rgba(0,0,0,0.04);
+  border: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 12px; padding: 13px 16px;
+  font-family:'Outfit',sans-serif; font-size:0.88rem; color:var(--text);
+  outline:none; transition: border-color 0.25s; margin-bottom: 14px; display:block;
+}
+.field::placeholder { color:var(--muted); }
+.field:focus { border-color: var(--c1); }
+textarea.field { height:90px; resize:none; }
+.form-btn {
+  width:100%; padding:15px; border:none; border-radius:12px;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  color:white; font-family:'Outfit',sans-serif; font-size:0.88rem; font-weight:700;
+  cursor:pointer; transition:transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 8px 24px rgba(108,71,255,0.35);
+}
+.form-btn:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(108,71,255,0.45); }
+
+/* ═══ FOOTER ═══ */
+footer {
+  background: var(--dark);
+  padding: 80px 56px 40px;
+}
+.footer-top {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px;
+  padding-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 40px;
+}
+.footer-logo {
+  font-size:1.4rem; font-weight:900; letter-spacing:-0.04em;
+  background: linear-gradient(135deg,var(--c1),var(--c2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  display:block; margin-bottom:18px;
+}
+.footer-brand p { font-size:0.85rem; line-height:1.8; color:rgba(255,255,255,0.4); max-width:260px; }
+.footer-col h4 { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.18em; color:rgba(255,255,255,0.3); margin-bottom:22px; }
+.footer-col ul { list-style:none; }
+.footer-col li { margin-bottom:12px; }
+.footer-col a { font-size:0.85rem; color:rgba(255,255,255,0.55); text-decoration:none; transition:color 0.25s; }
+.footer-col a:hover { color:white; }
+.footer-bottom { display:flex; justify-content:space-between; align-items:center; }
+.footer-copy { font-size:0.78rem; color:rgba(255,255,255,0.25); }
+.footer-socials { display:flex; gap:12px; }
+.soc-btn {
+  width:40px; height:40px; border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex; align-items:center; justify-content:center;
+  color:rgba(255,255,255,0.4); font-size:0.85rem; text-decoration:none;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+.soc-btn:hover { background:var(--c1); color:white; border-color:var(--c1); }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeSlideDown { from{opacity:0;transform:translateY(-24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.reveal { opacity:0; transform:translateY(36px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity:1; transform:translateY(0); }
+.reveal-l { opacity:0; transform:translateX(-40px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal-l.in { opacity:1; transform:translateX(0); }
+.reveal-r { opacity:0; transform:translateX(40px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.reveal-r.in { opacity:1; transform:translateX(0); }
+.d1{transition-delay:0.1s} .d2{transition-delay:0.18s} .d3{transition-delay:0.26s}
+.d4{transition-delay:0.34s} .d5{transition-delay:0.42s} .d6{transition-delay:0.5s}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  nav{padding:16px 24px;}
+  .nav-links{display:none;}
+  .hero{padding:100px 24px 60px;}
+  .hero-inner{grid-template-columns:1fr;}
+  .hero-right{display:none;}
+  .stats-strip{grid-template-columns:1fr 1fr;padding:40px 24px;}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(0,0,0,0.06);}
+  .about{grid-template-columns:1fr;padding:80px 24px;gap:40px;}
+  .about-visual{min-height:280px;}
+  .products{padding:80px 24px;}
+  .products-grid{grid-template-columns:1fr;}
+  .why{padding:80px 24px;}
+  .why-grid{grid-template-columns:1fr;}
+  .testi{padding:80px 24px;}
+  .cta-band{flex-direction:column;margin:0 16px 40px;padding:48px 32px;}
+  .cta-right-form{width:100%;}
+  footer{padding:60px 24px 32px;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:40px;}
+  .footer-bottom{flex-direction:column;gap:20px;text-align:center;}
+  body{cursor:auto;}
+  .cursor,.cursor-trail{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="curT"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Link+ Security</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-btn">Get Quote →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge"><span class="hero-badge-dot"></span> Since 1999 · Delhi, India</div>
+      <h1 class="hero-h1">
+        Protecting<br>
+        <span class="grad">What Matters</span><br>
+        Most To You
+      </h1>
+      <p class="hero-sub">Electric door locks & smart security systems built for Indian homes. Trusted by 200+ dealers across Delhi and India.</p>
+      <div class="hero-actions">
+        <a href="#products" class="btn-main">
+          Explore Products
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#contact" class="btn-out">Get a Quote</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="float-card fc-1">
+        <div class="fc-icon ic1">🔐</div>
+        <div class="fc-num" style="background:linear-gradient(135deg,#6c47ff,#9b7aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">25</div>
+        <div class="fc-label">Years of Trust</div>
+      </div>
+      <div class="float-card fc-2">
+        <div class="fc-icon ic2">🔑</div>
+        <div class="fc-num" style="background:linear-gradient(135deg,#ff4f8b,#ff85aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">200<sup style="font-size:1rem">+</sup></div>
+        <div class="fc-label">Dealer Network</div>
+      </div>
+      <div class="float-card fc-3">
+        <div class="fc-icon ic3">📡</div>
+        <div class="fc-num" style="background:linear-gradient(135deg,#00d4aa,#00f0c0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Wi-Fi</div>
+        <div class="fc-label">Smart Locks</div>
+      </div>
+      <div class="float-card fc-4">
+        <div class="fc-icon ic4">⚡</div>
+        <div class="fc-num" style="background:linear-gradient(135deg,#ff8c42,#ffb47a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">15<sup style="font-size:1rem">+</sup></div>
+        <div class="fc-label">Products</div>
+      </div>
+      <div class="float-card fc-5">
+        <div class="fc-icon ic5">✅</div>
+        <div class="fc-num" style="background:linear-gradient(135deg,#3b9eff,#70bfff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">100%</div>
+        <div class="fc-label">Satisfaction Rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Electric Door Locks</div>
+    <div class="marquee-item">Hook Latch Systems</div>
+    <div class="marquee-item">Roller Latch Locks</div>
+    <div class="marquee-item">Remote Kits</div>
+    <div class="marquee-item">Wi-Fi Smart Locks</div>
+    <div class="marquee-item">Power Supply Units</div>
+    <div class="marquee-item">Security Accessories</div>
+    <div class="marquee-item">Delhi Trusted Brand</div>
+    <div class="marquee-item">Electric Door Locks</div>
+    <div class="marquee-item">Hook Latch Systems</div>
+    <div class="marquee-item">Roller Latch Locks</div>
+    <div class="marquee-item">Remote Kits</div>
+    <div class="marquee-item">Wi-Fi Smart Locks</div>
+    <div class="marquee-item">Power Supply Units</div>
+    <div class="marquee-item">Security Accessories</div>
+    <div class="marquee-item">Delhi Trusted Brand</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip reveal">
+  <div class="stat-item">
+    <div class="stat-n" id="s1">0</div>
+    <div class="stat-l">Years of Experience</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-n" id="s2">0</div>
+    <div class="stat-l">Dealer Partners</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-n" id="s3">0</div>
+    <div class="stat-l">Product Variants</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-n" id="s4">0</div>
+    <div class="stat-l">Client Satisfaction</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-visual reveal-l">
+    <div class="about-visual-bg"></div>
+    <div class="about-shield-wrap">
+      <svg class="shield-svg" viewBox="0 0 180 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M90 8L168 42V126Q168 188 90 212Q12 188 12 126V42Z" stroke="url(#sg)" stroke-width="2" fill="rgba(255,255,255,0.04)"/>
+        <path d="M90 28L152 58V126Q152 178 90 200Q28 178 28 126V58Z" stroke="rgba(255,255,255,0.15)" stroke-width="1" fill="none"/>
+        <rect x="70" y="110" width="40" height="30" rx="4" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
+        <path d="M78 110V102Q78 90 90 90Q102 90 102 102V110" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="90" cy="124" r="5" fill="white" fill-opacity="0.9"/>
+        <line x1="90" y1="129" x2="90" y2="134" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <text x="90" y="80" text-anchor="middle" font-family="Outfit" font-size="10" fill="rgba(255,255,255,0.4)" font-weight="700" letter-spacing="3">LINK PLUS</text>
+        <defs>
+          <linearGradient id="sg" x1="0" y1="0" x2="180" y2="220" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6c47ff"/>
+            <stop offset="0.5" stop-color="#ff4f8b"/>
+            <stop offset="1" stop-color="#00d4aa"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="about-badge-yr">1999</div>
+  </div>
+  <div class="reveal-r">
+    <div class="about-tag">✦ Our Story</div>
+    <h2>Building <span>Security</span><br>Since 1999</h2>
+    <p>At LINK PLUS, we understand that security isn't just about systems — it's about peace of mind. Founded in 1999 as Lifeguard Integrated Security Solutions, we've spent over two decades building electric door lock systems trusted across India.</p>
+    <p>From classic remote kits to cutting-edge Wi-Fi smart locks, every product is engineered for Indian conditions — built to last, easy to install, and backed by our legendary after-sales support.</p>
+    <div class="about-chips">
+      <span class="chip chip-v">Electric Locks</span>
+      <span class="chip chip-p">Remote Systems</span>
+      <span class="chip chip-c">Wi-Fi Smart</span>
+      <span class="chip chip-o">Power Supply</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="products">
+  <div class="pb1 products-bg-blob"></div>
+  <div class="pb2 products-bg-blob"></div>
+  <div class="pb3 products-bg-blob"></div>
+  <div class="products-header reveal">
+    <div class="section-tag-dark">Our Range</div>
+    <h2>Premium Security<br>Products</h2>
+    <p>6 product lines · 15+ variants · Built for India</p>
+  </div>
+  <div class="products-grid">
+    <div class="prod-card reveal d1">
+      <div class="prod-num">01</div>
+      <div class="prod-icon-wrap">🔒</div>
+      <div class="prod-name">Electric Door Lock<br>Hook Latch</div>
+      <div class="prod-desc">Available in 6, 8, 12 & 16 key variants. Superior hook-latch mechanism for maximum holding strength.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+    <div class="prod-card reveal d2">
+      <div class="prod-num">02</div>
+      <div class="prod-icon-wrap">🔐</div>
+      <div class="prod-name">Electric Door Lock<br>Roller Latch</div>
+      <div class="prod-desc">Smooth roller mechanism in 6, 8, 12 & 16 key variants. Silent operation, seamless entry.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+    <div class="prod-card reveal d3">
+      <div class="prod-num">03</div>
+      <div class="prod-icon-wrap">📡</div>
+      <div class="prod-name">Remote Kit</div>
+      <div class="prod-desc">2 or 4 remotes in brown or white. Complete wireless door control — plug & play simplicity.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+    <div class="prod-card reveal d4">
+      <div class="prod-num">04</div>
+      <div class="prod-icon-wrap">📶</div>
+      <div class="prod-name">Wi-Fi Remote Kit</div>
+      <div class="prod-desc">Control your lock from anywhere in the world via smartphone. Smart home security made easy.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+    <div class="prod-card reveal d5">
+      <div class="prod-num">05</div>
+      <div class="prod-icon-wrap">⚡</div>
+      <div class="prod-name">Power Supply</div>
+      <div class="prod-desc">WiFi Smart, VDP, Bell Switch & Remote Kit supply variants. Reliable power for 24/7 security.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+    <div class="prod-card reveal d6">
+      <div class="prod-num">06</div>
+      <div class="prod-icon-wrap">🔧</div>
+      <div class="prod-name">Accessories</div>
+      <div class="prod-desc">Remotes, coils, 433 MHz receivers, cells & more. Everything to keep your system running perfectly.</div>
+      <a href="#contact" class="prod-link">View Range →</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="why" id="why">
+  <div class="why-header reveal">
+    <div class="about-tag" style="display:inline-flex;">✦ Why Link Plus</div>
+    <h2>The <span>Smart Choice</span><br>for Home Security</h2>
+    <p>What sets us apart from every other lock brand in India</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card wc1 reveal d1">
+      <span class="why-card-icon">🛡️</span>
+      <h3>Unbreakable Security</h3>
+      <p>Our electric locks are engineered to resist forced entry, providing a robust physical barrier that gives you genuine peace of mind around the clock.</p>
+    </div>
+    <div class="why-card wc2 reveal d2">
+      <span class="why-card-icon">📱</span>
+      <h3>Smart Connectivity</h3>
+      <p>Wi-Fi enabled remote kits let you control and monitor your locks from anywhere. Lock your door from your office, your car, anywhere in the world.</p>
+    </div>
+    <div class="why-card wc3 reveal d3">
+      <span class="why-card-icon">🌧️</span>
+      <h3>Built for India</h3>
+      <p>Tested against Indian weather — from Delhi winters to monsoon humidity. Our locks are built to perform in real Indian conditions, not lab conditions.</p>
+    </div>
+    <div class="why-card wc4 reveal d4">
+      <span class="why-card-icon">🤝</span>
+      <h3>25 Years of Trust</h3>
+      <p>Over two decades of experience and 200+ dealers across India means you're backed by a network that knows security, and a brand that keeps its promises.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi" id="testimonials">
+  <div class="testi-header reveal">
+    <div class="about-tag" style="display:inline-flex;">✦ Client Love</div>
+    <h2>Real <span>People</span><br>Real Results</h2>
+  </div>
+  <div style="overflow:hidden;">
+    <div class="testi-track">
+      <!-- Set 1 -->
+      <div class="testi-card t1">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"The installation was smooth, and the smart lock's features are perfect for keeping my family safe at home."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">V</div>
+          <div><div class="testi-name">Vicky Rao</div><div class="testi-loc">Delhi, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t2">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Excellent customer support and durable locks that work perfectly for Indian weather conditions."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div><div class="testi-name">Anil Kumar</div><div class="testi-loc">Delhi, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t3">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"The remote door opening technology works perfectly for our society. Very reliable and easy to use."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">V</div>
+          <div><div class="testi-name">Vishal Singh</div><div class="testi-loc">Noida, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t4">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Been using Link Plus locks for 5 years. Never had a single issue. Best investment for home security."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">R</div>
+          <div><div class="testi-name">Rahul Sharma</div><div class="testi-loc">Krishna Nagar, Delhi</div></div>
+        </div>
+      </div>
+      <div class="testi-card t5">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Their Wi-Fi kit is outstanding. I can check who's at my door from my office. Totally worth it!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">P</div>
+          <div><div class="testi-name">Priya Malhotra</div><div class="testi-loc">Gurgaon, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t6">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"As a dealer, Link Plus has been the most reliable brand I've stocked. Zero returns, zero complaints."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">S</div>
+          <div><div class="testi-name">Suresh Gupta</div><div class="testi-loc">Dealer, Delhi</div></div>
+        </div>
+      </div>
+      <!-- Duplicated for infinite scroll -->
+      <div class="testi-card t1">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"The installation was smooth, and the smart lock's features are perfect for keeping my family safe at home."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">V</div>
+          <div><div class="testi-name">Vicky Rao</div><div class="testi-loc">Delhi, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t2">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Excellent customer support and durable locks that work perfectly for Indian weather conditions."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div><div class="testi-name">Anil Kumar</div><div class="testi-loc">Delhi, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t3">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"The remote door opening technology works perfectly for our society. Very reliable and easy to use."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">V</div>
+          <div><div class="testi-name">Vishal Singh</div><div class="testi-loc">Noida, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t4">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Been using Link Plus locks for 5 years. Never had a single issue. Best investment for home security."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">R</div>
+          <div><div class="testi-name">Rahul Sharma</div><div class="testi-loc">Krishna Nagar, Delhi</div></div>
+        </div>
+      </div>
+      <div class="testi-card t5">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"Their Wi-Fi kit is outstanding. I can check who's at my door from my office. Totally worth it!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">P</div>
+          <div><div class="testi-name">Priya Malhotra</div><div class="testi-loc">Gurgaon, India</div></div>
+        </div>
+      </div>
+      <div class="testi-card t6">
+        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+        <p class="testi-text">"As a dealer, Link Plus has been the most reliable brand I've stocked. Zero returns, zero complaints."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">S</div>
+          <div><div class="testi-name">Suresh Gupta</div><div class="testi-loc">Dealer, Delhi</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="cta-band">
+    <div class="cta-blob ctab1"></div>
+    <div class="cta-blob ctab2"></div>
+    <div class="cta-left">
+      <h2>Ready to Secure<br>Your Home?</h2>
+      <p>Get a free quote from our Delhi team. We'll recommend the best lock system for your needs and budget — no pressure, just expertise.</p>
+      <div style="margin-top:32px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;gap:14px;color:white;">
+          <span style="font-size:1.2rem;">📱</span>
+          <div>
+            <div style="font-size:0.7rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">WhatsApp</div>
+            <a href="tel:+919213188840" style="color:white;font-weight:700;text-decoration:none;font-size:1rem;">+91 92131 88840</a>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;color:white;">
+          <span style="font-size:1.2rem;">✉️</span>
+          <div>
+            <div style="font-size:0.7rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Email</div>
+            <a href="mailto:cclinkplus16@gmail.com" style="color:white;font-weight:700;text-decoration:none;font-size:1rem;">cclinkplus16@gmail.com</a>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;color:white;">
+          <span style="font-size:1.2rem;">📍</span>
+          <div>
+            <div style="font-size:0.7rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Address</div>
+            <span style="color:white;font-weight:500;font-size:0.9rem;">Gali No. 5, West Chander Nagar, Krishna Nagar, Delhi — 110051</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-right-form">
+      <h3>Get a Free Quote</h3>
+      <p>Response within 24 hours, guaranteed.</p>
+      <input class="field" type="text" placeholder="Your Name">
+      <input class="field" type="tel" placeholder="Phone Number">
+      <input class="field" type="email" placeholder="Email Address">
+      <textarea class="field" placeholder="Tell us your requirements..."></textarea>
+      <button class="form-btn">Send Inquiry →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="footer-logo">Link+ Security</span>
+      <p>Providing premium electric door lock solutions since 1999. 200+ dealers, 25 years of trust across Delhi and India.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="#">Hook Latch Locks</a></li>
+        <li><a href="#">Roller Latch Locks</a></li>
+        <li><a href="#">Remote Kits</a></li>
+        <li><a href="#">Wi-Fi Remote Kits</a></li>
+        <li><a href="#">Power Supply</a></li>
+        <li><a href="#">Accessories</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Gallery</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:+919213188840">+91 92131 88840</a></li>
+        <li><a href="mailto:cclinkplus16@gmail.com">cclinkplus16@gmail.com</a></li>
+        <li><a href="#">YouTube Channel</a></li>
+        <li><a href="#">WhatsApp Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 linkplussecurity.in · All Rights Reserved · Lifeguard Integrated Security Solutions</div>
+    <div class="footer-socials">
+      <a href="https://youtube.com/@linkplusofficial" class="soc-btn">▶</a>
+      <a href="tel:+919213188840" class="soc-btn">✆</a>
+      <a href="mailto:cclinkplus16@gmail.com" class="soc-btn">✉</a>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/919213188840" target="_blank" style="
+  position:fixed; bottom:28px; right:28px; z-index:9000;
+  width:58px; height:58px; border-radius:50%;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; text-decoration:none;
+  box-shadow:0 8px 30px rgba(37,211,102,0.5);
+  animation:waBounce 3s ease-in-out infinite;
+" title="Chat on WhatsApp">💬</a>
+
+<script>
+// ─── CURSOR ───
+const cur = document.getElementById('cur');
+const curT = document.getElementById('curT');
+let cx = 0, cy = 0;
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    curT.style.left = e.clientX + 'px';
+    curT.style.top = e.clientY + 'px';
+  }, 80);
+  cx = e.clientX; cy = e.clientY;
+});
+document.querySelectorAll('a,button,.prod-card,.why-card,.testi-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cur.style.transform = 'translate(-50%,-50%) scale(3)';
+    curT.style.width = '60px'; curT.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cur.style.transform = 'translate(-50%,-50%) scale(1)';
+    curT.style.width = '40px'; curT.style.height = '40px';
+  });
+});
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal, .reveal-l, .reveal-r');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+reveals.forEach(r => obs.observe(r));
+
+// ─── COUNTER ANIMATION ───
+function animCount(el, end, suffix='', duration=1800) {
+  let start = 0;
+  const step = end / (duration / 16);
+  const timer = setInterval(() => {
+    start = Math.min(start + step, end);
+    el.textContent = Math.floor(start) + suffix;
+    if (start >= end) clearInterval(timer);
+  }, 16);
+}
+const statsObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    animCount(document.getElementById('s1'), 25, '+');
+    animCount(document.getElementById('s2'), 200, '+');
+    animCount(document.getElementById('s3'), 15, '+');
+    animCount(document.getElementById('s4'), 100, '%');
+    statsObs.disconnect();
+  }
+}, { threshold: 0.3 });
+statsObs.observe(document.querySelector('.stats-strip'));
+
+// ─── SMOOTH SCROLL ───
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// ─── WA BOUNCE ───
+const style = document.createElement('style');
+style.textContent = '@keyframes waBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
